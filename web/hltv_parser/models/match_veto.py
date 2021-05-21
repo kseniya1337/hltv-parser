@@ -2,7 +2,7 @@ from django.db import models
 from model_utils import Choices
 
 
-class Veto(models.Model):
+class MatchVeto(models.Model):
     match = models.ForeignKey(
         to='hltv_parser.Match',
         related_name='match',
