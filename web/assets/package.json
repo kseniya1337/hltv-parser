@@ -1,0 +1,24 @@
+{
+  "name": "hltv-parser",
+  "version": "1.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.14",
+    "@babel/preset-env": "^7.14",
+    "@popperjs/core": "^2.9.2",
+    "autoprefixer": "^10.2",
+    "babel-loader": "^8.2",
+    "bootstrap": "^5.0.1",
+    "css-loader": "^5.2",
+    "file-loader": "^6.2",
+    "postcss": "^8.2",
+    "postcss-loader": "^5.3",
+    "precss": "^4.0",
+    "sass": "^1.32",
+    "sass-loader": "^11.1",
+    "style-loader": "^2.0",
+    "webpack": "^5.37",
+    "webpack-cli": "^4.7",
+    "webpack-dev-server": "^3.11"
+  }
+}

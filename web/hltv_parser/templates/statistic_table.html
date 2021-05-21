@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Статистика{% endblock %}
+{% block content %}
+    <div class="statistic_table_content">
+        <h2>Статистика команды team_name</h2>
+        <div class="statistic_table_content__help">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th scope="row">Выбор команды</th>
+                        <td class="table-success"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Выбор соперника</th>
+                        <td class="table-warning"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Бан команды</th>
+                        <td class="table-danger"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Бан соперника</th>
+                        <td class="table-secondary"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Крайняя карта</th>
+                        <td class="table-primary"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="statistic_table_content__table">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for map in maps %}
+                            <th scope="col">{{ map }}</th>
+                        {% endfor %}
+                        <th scope="col">Турнир</th>
+                        <th scope="col">Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Gambit</th>
+                        <td class="table-secondary">16-13</td>
+                        <td class="table-success">16-7</td>
+                        <td class="table-danger">7-12</td>
+                        <td class="table-primary">11-16</td>
+                        <td class="table-danger">16-3</td>
+                        <td class="table-primary">16-5</td>
+                        <td class="table-danger">16-5</td>
+                        <td>ELEAGUE Major</td>
+                        <td>22.01.17</td>
+                    </tr>
+                </tbody>
+            </table>
+       </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+@import "~bootstrap/scss/bootstrap";
+.base_header {
+    background-color: #2d6da3;
+    font-size: 26px;
+}
+.base_header a{
+    color: white;
+}
+.base_header a:hover{
+    color: aliceblue;
+}
+
+.index_content{
+    width: 30%;
+    margin-top: 100px;
+}
+
+.index_content__choose_team__btn_submit {
+    margin-top: 10px;
+}
+
+.statistic_table_content{
+    margin-top: 50px;
+}
+
+.statistic_table_content__table {
+    margin-top: 20px;
+}

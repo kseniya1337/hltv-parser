@@ -1,0 +1,2 @@
+web: python manage.py runserver
+webpack: cd $(pwd)/assets && webpack serve
