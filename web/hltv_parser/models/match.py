@@ -32,6 +32,12 @@ class Match(models.Model):
         verbose_name='дата проведения'
     )
 
+    tournament = models.ForeignKey(
+        to='hltv_parser.Tournament',
+        related_name='tournament',
+        on_delete=models.deletion.SET_NULL,
+        verbose_name='турнир',
+    )
     class Meta:
         verbose_name = 'матч'
         verbose_name_plural = 'матчи'
