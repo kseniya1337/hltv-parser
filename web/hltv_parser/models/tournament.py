@@ -8,7 +8,8 @@ class Tournament(models.Model):
     )
 
     date = models.CharField(
-        verbose_name='дата проведения'
+        verbose_name='дата проведения',
+        max_length=255,
     )
 
     logo = models.ImageField(

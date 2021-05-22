@@ -4,15 +4,15 @@ from django.db import models
 class MatchMap(models.Model):
     match = models.ForeignKey(
         to='hltv_parser.Match',
-        related_name='match',
-        on_delete=models.deletion.SET_NULL,
+        related_name='+',
+        on_delete=models.deletion.CASCADE,
         verbose_name='матч',
     )
 
     map = models.ForeignKey(
         to='hltv_parser.Map',
-        related_name='map',
-        on_delete=models.deletion.SET_NULL,
+        related_name='+',
+        on_delete=models.deletion.CASCADE,
         verbose_name='карта',
     )
 
@@ -21,16 +21,18 @@ class MatchMap(models.Model):
     )
 
     score = models.CharField(
-        verbose_name='счет карты'
+        verbose_name='счет карты',
+        max_length=255,
     )
 
     result = models.CharField(
-        verbose_name='результат карты'
+        verbose_name='результат карты',
+        max_length=255,
     )
 
     veto = models.ForeignKey(
-        to='hltv_parser.Veto',
-        related_name='veto',
-        on_delete=models.deletion.SET_NULL,
+        to='hltv_parser.MatchVeto',
+        related_name='+',
+        on_delete=models.deletion.CASCADE,
         verbose_name='вето',
     )
