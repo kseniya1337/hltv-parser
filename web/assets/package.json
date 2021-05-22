@@ -14,7 +14,7 @@
     "postcss": "^8.2",
     "postcss-loader": "^5.3",
     "precss": "^4.0",
-    "sass": "^1.32.13",
+    "sass": "1.32.13",
     "sass-loader": "^11.1",
     "style-loader": "^2.0",
     "webpack": "^5.37",
