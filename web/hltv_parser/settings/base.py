@@ -77,3 +77,5 @@ AUTH_USER_MODEL = 'hltv_parser.User'
 STATICFILES_DIRS = [path('static')]
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
