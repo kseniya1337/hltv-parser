@@ -2,36 +2,37 @@ from django.db import models
 
 
 class Match(models.Model):
-    type = models.CharField(
+    hltv_id = models.IntegerField(
+        verbose_name='id матча на hltv'
+    )
+    match_type = models.CharField(
         verbose_name='тип',
         max_length=255,
     )
 
-    first_participant = models.ForeignKey(
+    first_team = models.ForeignKey(
         to='hltv_parser.Team',
         related_name='+',
         on_delete=models.deletion.CASCADE,
-        verbose_name='первый участник',
+        verbose_name='первая команда',
     )
 
-    second_participant = models.ForeignKey(
+    second_team = models.ForeignKey(
         to='hltv_parser.Team',
         related_name='+',
         on_delete=models.deletion.CASCADE,
-        verbose_name='второй участник',
+        verbose_name='вторая команда',
     )
 
-    score = models.CharField(
-        verbose_name='счет матча',
-        max_length=255,
+    first_team_score = models.IntegerField(
+        verbose_name='результат первой команды'
     )
 
-    result = models.CharField(
-        verbose_name='результат матча',
-        max_length=255,
+    second_team_score = models.IntegerField(
+        verbose_name='результат второй команды'
     )
 
-    date = models.CharField(
+    match_date = models.CharField(
         verbose_name='дата проведения',
         max_length=255,
     )
