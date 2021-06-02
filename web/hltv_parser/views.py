@@ -10,3 +10,7 @@ def statistic_table(request):
     return render(request, 'statistic_table.html', {
         'maps': competitive_maps,
     })
+
+
+def team_profile(request):
+    return render(request, 'team_profile.html')

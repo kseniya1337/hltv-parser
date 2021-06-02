@@ -1,28 +1,53 @@
 @import "~bootstrap/scss/bootstrap";
-.base_header {
-    background-color: #2d6da3;
-    font-size: 26px;
-}
-.base_header a{
-    color: white;
-}
-.base_header a:hover{
-    color: aliceblue;
+
+body {
+  background-color: white;
 }
 
-.index_content{
-    width: 30%;
-    margin-top: 100px;
+.base_header {
+  color: #2d6da3;
+  font-size: 28px;
+  box-shadow: 0 0 5px;
 }
+
+.base_header a {
+  color: #2d6da3;
+}
+
+.base_header a:hover {
+  color: #273d6d;
+}
+
+.index_content {
+  margin-top: 100px;
+}
+
 
 .index_content__choose_team__btn_submit {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
-.statistic_table_content{
-    margin-top: 50px;
+.statistic_table_content {
+  margin-top: 50px;
+  font-size: 13px;
 }
 
 .statistic_table_content__table {
-    margin-top: 20px;
+  margin-top: 20px;
+  padding-bottom: 100px;
+}
+
+.statistic_table_content__help {
+  width: 30%;
+  margin: 0 auto;
+}
+
+.statistic_table_content_footer {
+  background-color: white;
+  font-size: 12px;
+  text-align: center;
+}
+
+.team_profile__content {
+  padding-top: 50px;
 }

@@ -5,7 +5,7 @@ from traceback import print_exc
 import requests
 import time
 
-from hltv_parser.models import Team, Match
+from hltv_parser.models import Team, Match, MatchVeto, Map
 
 
 class Command(BaseCommand):
@@ -14,9 +14,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for url in self._parse_matches_urls():
             self._parse_match(url)
-
-    def _parse_veto(self):
-        pass
 
     def _parse_match(self, url):
         soup = self._get_html(url)
@@ -34,14 +31,36 @@ class Command(BaseCommand):
         result_team_1, result_team_2 = int(score_soup[0].text), int(score_soup[1].text)
 
         date = soup.find('date')
-        try:
-            return Match.objects.get(hltv_id=match_id)
-        except:
-            match = Match(hltv_id=match_id, match_type=match_type, first_team=team1, second_team=team2,
-                          first_team_score=result_team_1, second_team_score=result_team_2, match_date=date,
-                          tournament=tournament)
-            match.save()
-            return match
+        match = Match(hltv_id=match_id, match_type=match_type, first_team=team1, second_team=team2,
+                      first_team_score=result_team_1, second_team_score=result_team_2, match_date=date,
+                      tournament=tournament)
+        match.save()
+
+        match_veto_soup = soup.find_all('div', {'class': 'veto-box'})[1].split('\n')
+        for line in match_veto_soup:
+            match_veto_action_number = line.split(' ')[0].replase('.', '')
+            match_veto_team_name = line.split(' ')[1]
+            match_veto_action = line.split(' ')[2]
+            if match_veto_action == 'removed' and team1.name == match_veto_team_name:
+                result = MatchVeto.RESULT.ban_team
+            elif match_veto_action == 'picked' and team1.name == match_veto_team_name:
+                result = MatchVeto.RESULT.ban_team
+            elif match_veto_action == 'removed' and team2.name == match_veto_team_name:
+                result = MatchVeto.RESULT.ban_team
+            elif match_veto_action == 'picked' and team2.name == match_veto_team_name:
+                result = MatchVeto.RESULT.ban_team
+            else:
+                result = MatchVeto.RESULT.last
+            match_veto_map_name = line.split(' ')[3]
+            map = Map(match_veto_map_name)
+            veto = MatchVeto(match, map, match_veto_action_number, result)
+            veto.save()
+
+        match_map_soup = soup.find_all('div', {'class': 'mapholder'})
+        for element in match_map_soup:
+            match_map_name = element.find('mapname').text
+            match_map_score = element.find_all('div', {'class': 'results-team-score'})
+        return match, soup, veto
 
     def _parse_team(self, soup):
         team_id = soup.find('a', href=True)['href'].split('/')[2]
@@ -57,7 +76,10 @@ class Command(BaseCommand):
         soup = self._get_html('/results')
         match_urls = []
         for match_soup in soup.find_all('div', {'class': 'result-con'}):
-            match_urls.append(match_soup.find('a', href=True)['href'])
+            url = match_soup.find('a', href=True)['href']
+            if Match.objects.filter(hltv_id=url.split('/')[2]).exists():
+                break
+            match_urls.append(url)
         return match_urls[:3]
 
     def _get_html(self, url):

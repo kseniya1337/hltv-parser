@@ -25,4 +25,5 @@ urlpatterns = [
 
     path('', views.index, name='index'),
     path('vs/', views.statistic_table, name='statistic_table'),
+    path('team/', views.team_profile, name='team_profile'),
 ]

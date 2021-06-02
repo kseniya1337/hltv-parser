@@ -17,9 +17,13 @@ class MatchVeto(models.Model):
         verbose_name='карта',
     )
 
+    number_of_action = models.IntegerField(
+        verbose_name='номер выбора'
+    )
+
     RESULT = Choices(
-        (0, 'ban_team', 'Бан команды'),
-        (1, 'ban_enemy', 'Бан противника'),
+        (0, 'ban_team', 'Вычерк команды'),
+        (1, 'ban_enemy', 'Вычерк противника'),
         (2, 'pick_team', 'Выбор команды'),
         (3, 'pick_enemy', 'Выбор противника'),
         (4, 'last', 'Крайняя'),
@@ -27,8 +31,4 @@ class MatchVeto(models.Model):
 
     result = models.IntegerField(
         choices=RESULT,
-    )
-
-    datetime = models.DateField(
-        verbose_name='дата'
     )
