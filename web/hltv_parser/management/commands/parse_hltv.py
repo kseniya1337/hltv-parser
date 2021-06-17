@@ -5,7 +5,7 @@ from traceback import print_exc
 import requests
 import time
 
-from hltv_parser.models import Team, Match, MatchVeto, Map
+from hltv_parser.models import Team, Match, MatchVeto, Map, MatchMap, Tournament
 
 
 class Command(BaseCommand):
@@ -23,8 +23,9 @@ class Command(BaseCommand):
         team1 = self._parse_team(team1_soup)
         team2 = self._parse_team(team2_soup)
 
-        tournament = soup.find('event').text
-
+        tournament_name = soup.find('event').text
+        tournament = Tournament(name=tournament_name)
+        tournament.save()
         match_type = soup.find_all('div', {'class': 'veto-box'})[0].split('\n')[0]
 
         score_soup = soup.find_all('div', class_=lambda c: c in ['won', 'lost'])
@@ -44,31 +45,45 @@ class Command(BaseCommand):
             if match_veto_action == 'removed' and team1.name == match_veto_team_name:
                 result = MatchVeto.RESULT.ban_team
             elif match_veto_action == 'picked' and team1.name == match_veto_team_name:
-                result = MatchVeto.RESULT.ban_team
+                result = MatchVeto.RESULT.pick_team
             elif match_veto_action == 'removed' and team2.name == match_veto_team_name:
-                result = MatchVeto.RESULT.ban_team
+                result = MatchVeto.RESULT.ban_enemy
             elif match_veto_action == 'picked' and team2.name == match_veto_team_name:
-                result = MatchVeto.RESULT.ban_team
+                result = MatchVeto.RESULT.pick_enemy
             else:
                 result = MatchVeto.RESULT.last
             match_veto_map_name = line.split(' ')[3]
             map = Map(match_veto_map_name)
-            veto = MatchVeto(match, map, match_veto_action_number, result)
-            veto.save()
+            map.save()
+            match_veto = MatchVeto(match=match, map=map, number_of_action=match_veto_action_number, result=result)
+            match_veto.save()
 
         match_map_soup = soup.find_all('div', {'class': 'mapholder'})
+        score_lst = []
+        map_lst = []
         for element in match_map_soup:
-            match_map_name = element.find('mapname').text
+            match_map_name = element.find_all('div', {'class': 'mapname'})
+            for map in match_map_name:
+                map_lst.append(map.text)
             match_map_score = element.find_all('div', {'class': 'results-team-score'})
-        return match, soup, veto
+            for score in match_map_score:
+                score_lst.append(score.text)
+        new_score_lst = ['{}-{}'.format(score_lst[i], score_lst[i + 1]) for i in range(0, len(score_lst), 2)]
+        map_score_dict = dict(zip(map_lst, new_score_lst))
+        for key, value in map_score_dict.items():
+            if value != '---':
+                match_map = MatchMap(match=match, map=Map.objects.get(name=key), score=value)
+                match_map.save()
+        return match
 
     def _parse_team(self, soup):
         team_id = soup.find('a', href=True)['href'].split('/')[2]
         team_name = soup.find('div', {'class': 'teamName'}).text
+        team_logo = soup.find('img', src=True)['src']
         try:
             return Team.objects.get(hltv_id=team_id)
         except Team.DoesNotExist:
-            team = Team(hltv_name=team_id, name=team_name)
+            team = Team(hltv_id=team_id, name=team_name, logo=team_logo)
             team.save()
             return team
 

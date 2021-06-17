@@ -1,21 +1,24 @@
 @import "~bootstrap/scss/bootstrap";
+//@import "~bootstrap-icons/font/bootstrap-icons.css";
 
 body {
   background-color: white;
 }
 
 .base_header {
-  color: #2d6da3;
+  color: darkgray;
   font-size: 28px;
   box-shadow: 0 0 5px;
 }
 
 .base_header a {
-  color: #2d6da3;
+  //color: #2d6da3;
+  color: black;
 }
 
 .base_header a:hover {
-  color: #273d6d;
+  //color: #273d6d;
+  color: darkgray;
 }
 
 .index_content {

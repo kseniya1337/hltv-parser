@@ -7,14 +7,14 @@ class Tournament(models.Model):
         verbose_name='название',
     )
 
-    date = models.CharField(
-        verbose_name='дата проведения',
-        max_length=255,
-    )
-
-    logo = models.ImageField(
-        verbose_name='логотип'
-    )
+    # date = models.CharField(
+    #     verbose_name='дата проведения',
+    #     max_length=255,
+    # )
+    #
+    # logo = models.ImageField(
+    #     verbose_name='логотип'
+    # )
 
     class Meta:
         verbose_name = 'турнир'

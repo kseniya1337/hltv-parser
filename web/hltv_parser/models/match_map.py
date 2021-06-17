@@ -16,23 +16,11 @@ class MatchMap(models.Model):
         verbose_name='карта',
     )
 
-    datetime = models.DateField(
-        verbose_name='дата'
-    )
+    # datetime = models.DateField(
+    #     verbose_name='дата'
+    # )
 
     score = models.CharField(
         verbose_name='счет карты',
         max_length=255,
-    )
-
-    result = models.CharField(
-        verbose_name='результат карты',
-        max_length=255,
-    )
-
-    veto = models.ForeignKey(
-        to='hltv_parser.MatchVeto',
-        related_name='+',
-        on_delete=models.deletion.CASCADE,
-        verbose_name='вето',
     )

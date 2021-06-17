@@ -15,9 +15,10 @@ class Team(models.Model):
     # )
 
     #
-    # logo = models.ImageField(
-    #     verbose_name='логотип'
-    # )
+    logo = models.CharField(
+        max_length=510,
+        verbose_name='логотип'
+    )
 
     class Meta:
         verbose_name = 'команда'
