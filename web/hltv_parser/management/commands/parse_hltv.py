@@ -5,6 +5,8 @@ from traceback import print_exc
 import requests
 import time
 
+from django.db import transaction
+
 from hltv_parser.models import Team, Match, MatchVeto, Map, MatchMap, Tournament
 
 
@@ -13,7 +15,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for url in self._parse_matches_urls():
-            self._parse_match(url)
+            with transaction.atomic():
+                self._parse_match(url)
 
     def _parse_match(self, url):
         soup = self._get_html(url)
@@ -74,7 +77,6 @@ class Command(BaseCommand):
             if value != '---':
                 match_map = MatchMap(match=match, map=Map.objects.get(name=key), score=value)
                 match_map.save()
-        return match
 
     def _parse_team(self, soup):
         team_id = soup.find('a', href=True)['href'].split('/')[2]
