@@ -31,8 +31,6 @@ class Command(BaseCommand):
         tournament.save()
         match_type = soup.find_all('div', {'class': 'veto-box'})[0].split('\n')[0]
 
-
-
         score_soup = soup.find_all('div', class_=lambda c: c in ['won', 'lost'])
         result_team_1, result_team_2 = int(score_soup[0].text), int(score_soup[1].text)
 
