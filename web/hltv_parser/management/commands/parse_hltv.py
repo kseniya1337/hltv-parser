@@ -40,8 +40,10 @@ class Command(BaseCommand):
                       tournament=tournament)
         match.save()
 
-        match_veto_soup = soup.find_all('div', {'class': 'veto-box'})[1].split('\n')
-        for line in match_veto_soup:
+        match_veto_soup = soup.find_all('div', {'class': 'veto-box'})
+        if len(match_veto_soup) < 2:
+            return
+        for line in match_veto_soup[1].split('\n'):
             match_veto_action_number = line.split(' ')[0].replase('.', '')
             match_veto_team_name = line.split(' ')[1]
             match_veto_action = line.split(' ')[2]
@@ -61,48 +63,51 @@ class Command(BaseCommand):
             match_veto = MatchVeto(match=match, map=map, number_of_action=match_veto_action_number, result=result)
             match_veto.save()
 
-        match_map_soup = soup.find_all('div', {'class': 'mapholder'})
-        score_lst = []
-        map_lst = []
-        for element in match_map_soup:
-            match_map_name = element.find_all('div', {'class': 'mapname'})
-            for map in match_map_name:
-                map_lst.append(map.text)
-            match_map_score = element.find_all('div', {'class': 'results-team-score'})
-            for score in match_map_score:
-                score_lst.append(score.text)
-        new_score_lst = ['{}-{}'.format(score_lst[i], score_lst[i + 1]) for i in range(0, len(score_lst), 2)]
-        map_score_dict = dict(zip(map_lst, new_score_lst))
-        for key, value in map_score_dict.items():
-            if value != '---':
-                match_map = MatchMap(match=match, map=Map.objects.get(name=key), score=value)
-                match_map.save()
+    match_map_soup = soup.find_all('div', {'class': 'mapholder'})
+    score_lst = []
+    map_lst = []
+    for element in match_map_soup:
+        match_map_name = element.find_all('div', {'class': 'mapname'})
+        for map in match_map_name:
+            map_lst.append(map.text)
+        match_map_score = element.find_all('div', {'class': 'results-team-score'})
+        for score in match_map_score:
+            score_lst.append(score.text)
+    new_score_lst = ['{}-{}'.format(score_lst[i], score_lst[i + 1]) for i in range(0, len(score_lst), 2)]
+    map_score_dict = dict(zip(map_lst, new_score_lst))
+    for key, value in map_score_dict.items():
+        if value != '---':
+            match_map = MatchMap(match=match, map=Map.objects.get(name=key), score=value)
+            match_map.save()
 
-    def _parse_team(self, soup):
-        team_id = soup.find('a', href=True)['href'].split('/')[2]
-        team_name = soup.find('div', {'class': 'teamName'}).text
-        team_logo = soup.find('img', src=True)['src']
-        try:
-            return Team.objects.get(hltv_id=team_id)
-        except Team.DoesNotExist:
-            team = Team(hltv_id=team_id, name=team_name, logo=team_logo)
-            team.save()
-            return team
 
-    def _parse_matches_urls(self):
-        soup = self._get_html('/results')
-        match_urls = []
-        for match_soup in soup.find_all('div', {'class': 'result-con'}):
-            url = match_soup.find('a', href=True)['href']
-            if Match.objects.filter(hltv_id=url.split('/')[2]).exists():
-                break
-            match_urls.append(url)
-        return match_urls[:3]
+def _parse_team(self, soup):
+    team_id = soup.find('a', href=True)['href'].split('/')[2]
+    team_name = soup.find('div', {'class': 'teamName'}).text
+    team_logo = soup.find('img', src=True)['src']
+    try:
+        return Team.objects.get(hltv_id=team_id)
+    except Team.DoesNotExist:
+        team = Team(hltv_id=team_id, name=team_name, logo=team_logo)
+        team.save()
+        return team
 
-    def _get_html(self, url):
-        r = requests.get(self.base_url + url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-        }).text
-        soup = BeautifulSoup(r, 'html.parser')
-        time.sleep(0.5)
-        return soup
+
+def _parse_matches_urls(self):
+    soup = self._get_html('/results')
+    match_urls = []
+    for match_soup in soup.find_all('div', {'class': 'result-con'}):
+        url = match_soup.find('a', href=True)['href']
+        if Match.objects.filter(hltv_id=url.split('/')[2]).exists():
+            break
+        match_urls.append(url)
+    return match_urls[:3]
+
+
+def _get_html(self, url):
+    r = requests.get(self.base_url + url, headers={
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+    }).text
+    soup = BeautifulSoup(r, 'html.parser')
+    time.sleep(0.5)
+    return soup
