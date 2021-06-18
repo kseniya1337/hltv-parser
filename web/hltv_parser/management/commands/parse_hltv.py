@@ -44,7 +44,7 @@ class Command(BaseCommand):
         match.save()
 
         for line in match_veto_soup[1].split('\n'):
-            match_veto_action_number = line.split(' ')[0].replase('.', '')
+            match_veto_action_number = line.split(' ')[0].replace('.', '')
             match_veto_team_name = line.split(' ')[1]
             match_veto_action = line.split(' ')[2]
             if match_veto_action == 'removed' and team1.name == match_veto_team_name:
