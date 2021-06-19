@@ -1,17 +1,40 @@
 {% extends 'base.html' %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-    <div class="index_content">
-        <h3>Выберите команду</h3>
-        <form class="index_content__select_team_form">
-            <select class="form-select index_content__choose_team" aria-label="Default select example">
-                <option selected>Gambit</option>
-                <option value="1">G2</option>
-                <option value="2">Cloud9</option>
-                <option value="3">Spirit</option>
-                <option value="4">HaMaSSe</option>
-            </select>
-            <button type="submit" class="btn btn btn-outline-dark index_content__choose_team__btn_submit">Перейти к обзору</button>
-        </form>
-    </div>
+{#    <div class="index_content">#}
+{#        <h3>Выберите команду</h3>#}
+{#        <form class="index_content__select_team_form">#}
+{#            <select class="form-select index_content__choose_team" aria-label="Default select example">#}
+{#                <option selected>Gambit</option>#}
+{#                <option value="1">G2</option>#}
+{#                <option value="2">Cloud9</option>#}
+{#                <option value="3">Spirit</option>#}
+{#                <option value="4">HaMaSSe</option>#}
+{#            </select>#}
+{#            <button type="submit" class="btn btn btn-outline-dark index_content__choose_team__btn_submit">Перейти к#}
+{#                обзору#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+    {% for map in maps %}
+        <br>{{ map.name }}
+    {% endfor %}
+    {% for team in teams %}
+        <br>{{ team.name }}
+    {% endfor %}
+    {% for match in matches %}
+        <br>{{ match.name }}
+        <br>{{ match.match_type }}
+        <br>{{ match.hltv_id }}
+        <br>{{ match.first_team }}
+        <br>{{ match.second_team }}
+        <br>{{ match.first_team_score }}
+        <br>{{ match.second_team_score }}
+        <br>{{ match.match_date }}
+        <br>{{ match.tournament }}
+    {% endfor %}
+    {% for match_veto in matches_veto %}
+        <br>{{ match_veto.result }}
+        <br>{{ match_veto. }}
+    {% endfor %}
 {% endblock %}

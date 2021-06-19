@@ -1,7 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
 from bs4 import BeautifulSoup
-from traceback import print_exc
+import regex
 import requests
 import time
 
@@ -26,41 +25,51 @@ class Command(BaseCommand):
         team1 = self._parse_team(team1_soup)
         team2 = self._parse_team(team2_soup)
 
-        tournament_name = soup.find('event').text
-        tournament = Tournament(name=tournament_name)
-        tournament.save()
-        match_type = soup.find_all('div', {'class': 'veto-box'})[0].split('\n')[0]
-
+        tournament_soup = soup.find('div', {'class': 'event'})
+        tournament_name = tournament_soup.find('a').text
+        try:
+            tournament = Tournament.objects.get(name=tournament_name)
+        except Tournament.DoesNotExist:
+            tournament = Tournament(name=tournament_name)
+            tournament.save()
         score_soup = soup.find_all('div', class_=lambda c: c in ['won', 'lost'])
         result_team_1, result_team_2 = int(score_soup[0].text), int(score_soup[1].text)
 
-        date = soup.find('date')
+        date = soup.find('div', {'class': 'date'}).text
+
         match_veto_soup = soup.find_all('div', {'class': 'veto-box'})
+        match_type_soup = soup.find_all('div', {'class': 'veto-box'})[0].text.split('\n')
+        match_type_new = [value for value in match_type_soup if value != '']
+        match_type = match_type_new[0]
+
         if len(match_veto_soup) < 2:
             return
         match = Match(hltv_id=match_id, match_type=match_type, first_team=team1, second_team=team2,
                       first_team_score=result_team_1, second_team_score=result_team_2, match_date=date,
                       tournament=tournament)
         match.save()
-
-        for line in match_veto_soup[1].split('\n'):
-            match_veto_action_number = line.split(' ')[0].replace('.', '')
-            match_veto_team_name = line.split(' ')[1]
-            match_veto_action = line.split(' ')[2]
-            if match_veto_action == 'removed' and team1.name == match_veto_team_name:
+        for line in match_veto_soup[1].text.split('\n'):
+            if not line:
+                continue
+            match_veto_dict = regex.search(
+                '^(?P<number>\d+)\. ((?P<team>.+) (?P<action>picked|removed) (?P<map>.+)|('
+                '?P<map>.+) (?P<action>was left over))$', line).groupdict()
+            if match_veto_dict['action'] == 'removed' and team1.name == match_veto_dict['team']:
                 result = MatchVeto.RESULT.ban_team
-            elif match_veto_action == 'picked' and team1.name == match_veto_team_name:
+            elif match_veto_dict['action'] == 'picked' and team1.name == match_veto_dict['team']:
                 result = MatchVeto.RESULT.pick_team
-            elif match_veto_action == 'removed' and team2.name == match_veto_team_name:
+            elif match_veto_dict['action'] == 'removed' and team2.name == match_veto_dict['team']:
                 result = MatchVeto.RESULT.ban_enemy
-            elif match_veto_action == 'picked' and team2.name == match_veto_team_name:
+            elif match_veto_dict['action'] == 'picked' and team2.name == match_veto_dict['team']:
                 result = MatchVeto.RESULT.pick_enemy
             else:
                 result = MatchVeto.RESULT.last
-            match_veto_map_name = line.split(' ')[3]
-            map = Map(match_veto_map_name)
-            map.save()
-            match_veto = MatchVeto(match=match, map=map, number_of_action=match_veto_action_number, result=result)
+            try:
+                map = Map.objects.get(name=match_veto_dict['map'])
+            except Map.DoesNotExist:
+                map = Map(name=match_veto_dict['map'])
+                map.save()
+            match_veto = MatchVeto(match=match, map=map, number_of_action=match_veto_dict['number'], result=result)
             match_veto.save()
 
         match_map_soup = soup.find_all('div', {'class': 'mapholder'})
@@ -99,7 +108,7 @@ class Command(BaseCommand):
             if Match.objects.filter(hltv_id=url.split('/')[2]).exists():
                 break
             match_urls.append(url)
-        return match_urls[:3]
+        return match_urls
 
     def _get_html(self, url):
         r = requests.get(self.base_url + url, headers={

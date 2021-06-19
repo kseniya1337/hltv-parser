@@ -7,7 +7,6 @@ class Map(models.Model):
         max_length=255,
     )
 
-
     class Meta:
         verbose_name = 'карта'
         verbose_name_plural = 'карты'

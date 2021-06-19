@@ -1,8 +1,17 @@
 from django.shortcuts import render
 
+from hltv_parser.models import Map, Team, Match, MatchVeto
+
 
 def index(request):
-    return render(request, 'index.html')
+    maps = Map.objects.all()
+    teams = Team.objects.all()
+    matches = Match.objects.all()
+    return render(request, 'index.html', {
+        'maps': maps,
+        'teams': teams,
+        'matches': matches,
+    })
 
 
 def statistic_table(request):
